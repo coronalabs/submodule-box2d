@@ -56,6 +56,7 @@
 #include <Box2D/Dynamics/Joints/b2MotorJoint.h>
 #include <Box2D/Dynamics/Joints/b2MouseJoint.h>
 #include <Box2D/Dynamics/Joints/b2PrismaticJoint.h>
+#include <Box2D/Dynamics/Joints/b2PrismaticJointV2.h>
 #include <Box2D/Dynamics/Joints/b2PulleyJoint.h>
 #include <Box2D/Dynamics/Joints/b2RevoluteJoint.h>
 #include <Box2D/Dynamics/Joints/b2RopeJoint.h>

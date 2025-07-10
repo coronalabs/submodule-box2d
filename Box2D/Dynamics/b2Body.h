@@ -415,6 +415,7 @@ private:
 	friend class b2MotorJoint;
 	friend class b2MouseJoint;
 	friend class b2PrismaticJoint;
+	friend class b2PrismaticJointV2;
 	friend class b2PulleyJoint;
 	friend class b2RevoluteJoint;
 	friend class b2RopeJoint;

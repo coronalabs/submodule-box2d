@@ -31,6 +31,7 @@ enum b2JointType
 	e_unknownJoint,
 	e_revoluteJoint,
 	e_prismaticJoint,
+	e_prismaticJointV2,
 	e_distanceJoint,
 	e_pulleyJoint,
 	e_mouseJoint,
