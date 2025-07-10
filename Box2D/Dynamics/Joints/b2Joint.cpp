@@ -19,9 +19,11 @@
 #include <Box2D/Dynamics/Joints/b2Joint.h>
 #include <Box2D/Dynamics/Joints/b2DistanceJoint.h>
 #include <Box2D/Dynamics/Joints/b2WheelJoint.h>
+#include <Box2D/Dynamics/Joints/b2WheelJointV2.h>
 #include <Box2D/Dynamics/Joints/b2MouseJoint.h>
 #include <Box2D/Dynamics/Joints/b2RevoluteJoint.h>
 #include <Box2D/Dynamics/Joints/b2PrismaticJoint.h>
+#include <Box2D/Dynamics/Joints/b2PrismaticJointV2.h>
 #include <Box2D/Dynamics/Joints/b2PulleyJoint.h>
 #include <Box2D/Dynamics/Joints/b2GearJoint.h>
 #include <Box2D/Dynamics/Joints/b2WeldJoint.h>
@@ -61,6 +63,13 @@ b2Joint* b2Joint::Create(const b2JointDef* def, b2BlockAllocator* allocator)
 		}
 		break;
 
+	case e_prismaticJointV2:
+		{
+			void* mem = allocator->Allocate(sizeof(b2PrismaticJointV2));
+			joint = new (mem) b2PrismaticJointV2(static_cast<const b2PrismaticJointDefV2*>(def));
+		}
+		break;
+
 	case e_revoluteJoint:
 		{
 			void* mem = allocator->Allocate(sizeof(b2RevoluteJoint));
@@ -88,7 +97,12 @@ b2Joint* b2Joint::Create(const b2JointDef* def, b2BlockAllocator* allocator)
 			joint = new (mem) b2WheelJoint(static_cast<const b2WheelJointDef*>(def));
 		}
 		break;
-
+	case e_wheelJointV2:
+		{
+			void* mem = allocator->Allocate(sizeof(b2WheelJointV2));
+			joint = new (mem) b2WheelJointV2(static_cast<const b2WheelJointDefV2*>(def));
+		}
+		break;
 	case e_weldJoint:
 		{
 			void* mem = allocator->Allocate(sizeof(b2WeldJoint));
@@ -141,6 +155,10 @@ void b2Joint::Destroy(b2Joint* joint, b2BlockAllocator* allocator)
 	case e_prismaticJoint:
 		allocator->Free(joint, sizeof(b2PrismaticJoint));
 		break;
+	
+	case e_prismaticJointV2:
+		allocator->Free(joint, sizeof(b2PrismaticJointV2));
+		break;
 
 	case e_revoluteJoint:
 		allocator->Free(joint, sizeof(b2RevoluteJoint));
@@ -156,6 +174,10 @@ void b2Joint::Destroy(b2Joint* joint, b2BlockAllocator* allocator)
 
 	case e_wheelJoint:
 		allocator->Free(joint, sizeof(b2WheelJoint));
+		break;
+
+	case e_wheelJointV2:
+		allocator->Free(joint, sizeof(b2WheelJointV2));
 		break;
     
 	case e_weldJoint:
