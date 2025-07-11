@@ -18,6 +18,7 @@
 */
 
 #include <Box2D/Collision/Shapes/b2PolygonShape.h>
+#include <Box2D/Common/b2BlockAllocator.h>
 #include <new>
 
 b2Shape* b2PolygonShape::Clone(b2BlockAllocator* allocator) const
@@ -118,6 +119,61 @@ static b2Vec2 ComputeCentroid(const b2Vec2* vs, int32 count)
 	return c;
 }
 
+bool b2PolygonShape::Set(const b2Hull& hull)
+{
+	b2Assert(hull.count >= 3);
+	if (hull.count < 3)
+	{
+		SetAsBox(1.0f, 1.0f);
+		return false;
+	}
+
+	m_count = b2Min(hull.count, b2_maxPolygonVertices);
+
+	// Copy vertices
+	for (int32 i = 0; i < hull.count; ++i)
+	{
+		m_vertices[i] = hull.points[i];
+	}
+
+	// Compute normals. Ensure the edges have non-zero length.
+	for (int32 i = 0; i < m_count; ++i)
+	{
+		int32 i1 = i;
+		int32 i2 = i + 1 < m_count ? i + 1 : 0;
+		b2Vec2 edge = m_vertices[i2] - m_vertices[i1];
+		b2Assert(edge.LengthSquared() > b2_epsilon * b2_epsilon);
+		m_normals[i] = b2Cross(edge, 1.0f);
+		m_normals[i].Normalize();
+	}
+
+	// Compute the polygon centroid.
+	m_centroid = ComputeCentroid(m_vertices, m_count);
+	return true;
+}
+
+
+
+bool b2PolygonShape::Set(const b2Vec2* vertices, int32 count, bool needHull)
+{
+
+	if (needHull)
+	{
+		b2Hull hull = b2ComputeHull(vertices, count);
+		if (hull.count < 3)
+		{
+			SetAsBox(1.0f, 1.0f);
+			return false;
+		}
+
+		return Set(hull);
+	}
+	else
+	{
+		return Set(vertices, count);
+	}
+}
+
 bool b2PolygonShape::Set(const b2Vec2* vertices, int32 count)
 {
 	b2Assert(3 <= count && count <= b2_maxPolygonVertices);
@@ -126,7 +182,7 @@ bool b2PolygonShape::Set(const b2Vec2* vertices, int32 count)
 		SetAsBox(1.0f, 1.0f);
 		return false;
 	}
-	
+
 	int32 n = b2Min(count, b2_maxPolygonVertices);
 
 	// Perform welding and copy vertices into local buffer.
@@ -219,7 +275,7 @@ bool b2PolygonShape::Set(const b2Vec2* vertices, int32 count)
 			break;
 		}
 	}
-	
+
 	m_count = m;
 
 	// Copy vertices.
@@ -481,6 +537,25 @@ void b2PolygonShape::ComputeMass(b2MassData* massData, float32 density) const
 
 bool b2PolygonShape::Validate() const
 {
+	if (m_count < 3 || b2_maxPolygonVertices < m_count)
+	{
+		return false;
+	}
+
+	b2Hull hull;
+	for (int32 i = 0; i < m_count; ++i)
+	{
+		hull.points[i] = m_vertices[i];
+	}
+
+	hull.count = m_count;
+
+	return b2ValidateHull(hull);
+}
+
+/*
+bool b2PolygonShape::Validate() const
+{
 	for (int32 i = 0; i < m_count; ++i)
 	{
 		int32 i1 = i;
@@ -506,3 +581,4 @@ bool b2PolygonShape::Validate() const
 
 	return true;
 }
+*/
